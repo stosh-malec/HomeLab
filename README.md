@@ -1,2 +1,2 @@
-# HomeLab-TerraCotta
-Terraform for my current Home Lab setup. 
+# HomeLab-Composetopia
+All Docker-Compose for my current Home Lab setup. 
