@@ -3,4 +3,3 @@ docker-compose.override.yml
 docker-compose.yml.bak
 .env
 volumes/
-create_secrets.sh
