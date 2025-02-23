@@ -1,0 +1,18 @@
+replicaCount: 1
+
+image:
+  repository: wolveix/satisfactory-server
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  port: 7777
+
+resources:
+  requests:
+    memory: "4Gi"
+    cpu: "2"
+  limits:
+    memory: "8Gi"
+    cpu: "4"

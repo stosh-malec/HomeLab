@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "satisfactory-chart.fullname". }}
+  labels:
+    {{- include "satisfactory-chart.labels". | nindent 4 }}
+spec:
+  replicas: {{.Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "satisfactory-chart.selectorLabels". | nindent 6 }}
+  template:
+    metadata:
+      {{- with.Values.podAnnotations }}
+      annotations:
+        {{- toYaml. | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "satisfactory-chart.selectorLabels". | nindent 8 }}
+    spec:
+      containers:
+        - name: {{.Chart.Name }}
+          image: "{{.Values.image.repository }}:{{.Values.image.tag | default.Chart.AppVersion }}"
+          imagePullPolicy: {{.Values.image.pullPolicy }}
+          ports:
+            - name: satisfactory-tcp
+              containerPort: {{.Values.service.port }}
+              protocol: TCP
+            - name: satisfactory-udp
+              containerPort: {{.Values.service.port }}
+              protocol: UDP
+          resources:
+            {{- toYaml.Values.resources | nindent 12 }}
+          # Add any other container configurations here (env, volumeMounts, etc.)
+      # Add volumes here if needed 
