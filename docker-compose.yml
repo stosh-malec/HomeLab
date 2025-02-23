@@ -1,6 +1,6 @@
 services:
   twingate:
-    container_name: twingate-tactful-rabbit
+    container_name: twingate-rampant-raptor
     restart: always
     image: "twingate/connector:latest"
     environment:
@@ -20,7 +20,7 @@ services:
       - '7777:7777/udp'
       - '7777:7777/tcp'
     volumes:
-      - './satisfactory-server:${SATISFACTORY_SERVER_PATH}'
+      - '/config:/config'
     environment:
       - MAXPLAYERS=4
       - PGID=1000
@@ -37,6 +37,6 @@ services:
     deploy:
       resources:
         limits:
-          memory: 10G
+          memory: 8G
         reservations:
           memory: 4G
