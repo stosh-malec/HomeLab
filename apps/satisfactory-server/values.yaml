@@ -4,9 +4,8 @@ image:
   pullPolicy: IfNotPresent
 
 service:
-  type: NodePort
+  type: LoadBalancer
   port: 7777
-  nodePort: 30013
 
 persistence:
   enabled: true
@@ -16,7 +15,7 @@ persistence:
 resources:
   limits:
     memory: 8G
-  reservations:
+  requests:
     memory: 4G
 
 env:

@@ -25,10 +25,10 @@ spec:
             - name: game-data
               mountPath: {{ .Values.persistence.mountPath }}
           env:
-          {{- range $key, $value := .Values.env }}
+            {{- range $key, $value := .Values.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
-          {{- end }}
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
