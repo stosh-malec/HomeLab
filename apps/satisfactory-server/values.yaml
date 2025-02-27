@@ -1,0 +1,28 @@
+image:
+  repository: wolveix/satisfactory-server
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 7777
+  nodePort: 30013
+
+persistence:
+  enabled: true
+  existingClaim: satisfactory-files
+  mountPath: /satisfactory/config
+
+resources:
+  limits:
+    memory: 8G
+  reservations:
+    memory: 4G
+
+env:
+  MAXPLAYERS: 4
+  PGID: 1000
+  PUID: 1000
+  AUTOPAUSE: "false"
+  ROOTLESS: false
+  STEAMBETA: false
