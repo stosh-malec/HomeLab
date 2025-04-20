@@ -1,27 +1,23 @@
 # HomeLab
 
-This repository contains my personal homelab configurations, deployed using Kubernetes and Helm.
+This repository contains Homelab deployments and personal workstation setups
 
 ## Applications
 
 Here's a list of the applications currently running in my homelab:
 
 * **Minecraft Server:**
-    * A dedicated Minecraft server for playing with friends.
-    * Limited remote access over Twingate
-    * Modpack: DBS Minecraft Refined.
+    * Vanilla+ 
 * **Satisfactory Server:**
-    * A dedicated Satisfactory server.
-    * Limited remote access over Twingate
+    * Experimental statefull set with persistance
 * **Longhorn:**
     * A HA distributed storage system for Kubernetes.
-    * Provides persistent storage for applications.
     * Automatic Cloud Backups
 * **Twingate:**
-    * A modern VPN solution for secure remote access to homelab services.
     * Enables secure, limited access to internal applications/game servers for myself and friends
 
-## Kubernetes Setup
+## Hardware
 
 * Kubernetes cluster running on 3 single board computers.
     * Each node is equipped with an Intel i9 processor, 16GB DDR4 RAM, and a 1TB NVMe SSDs.
+* Unifi Dream Machine, Unfi Comcast Modem, Unifi PoE Switches, U7 APs
