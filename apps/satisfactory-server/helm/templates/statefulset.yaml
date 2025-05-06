@@ -1,11 +1,12 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name:  {{ .Chart.Name }}
+  name: {{ .Chart.Name }}
+  namespace: {{ .Values.namespace }}
 spec:
   selector:
     matchLabels:
-      app:  {{ .Chart.Name }}
+      app: {{ .Chart.Name }}
   serviceName:  {{ .Chart.Name }}
   replicas: 1
   template:
