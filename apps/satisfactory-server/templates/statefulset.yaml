@@ -39,6 +39,9 @@ spec:
             - name: "messaging"
               containerPort: 8888
               protocol: TCP
+            - name: "messaging-udp"
+              containerPort: 8888
+              protocol: UDP
           volumeMounts:
             - name: game-data
               mountPath: /satisfactory/config
