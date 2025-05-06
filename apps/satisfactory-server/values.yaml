@@ -1,0 +1,23 @@
+image:
+  repository: wolveix/satisfactory-server
+  tag: latest
+  pullPolicy: Always
+ 
+persistence:
+  enabled: true
+  existingClaim: satisfactory-files
+  mountPath: /config
+ 
+resources:
+  limits:
+    memory: 8G
+  reservations:
+    memory: 4G
+ 
+env:
+  MAXPLAYERS: 8
+  PGID: 1000
+  PUID: 1000
+  AUTOPAUSE: "false"
+  ROOTLESS: false
+  STEAMBETA: true
