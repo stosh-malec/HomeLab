@@ -1,0 +1,11 @@
+apiVersion: tsinf/v1alpha1
+kind: Delivery
+metadata:
+  name: satisfactory-server
+spec:
+  chart:
+    path: apps/satisfactory-server
+  valueFiles:
+    - values.all.yaml
+    - values.{{ .Environment }}.enc.yaml
+  valuesFilePrefix: helm 
