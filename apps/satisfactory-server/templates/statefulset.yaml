@@ -44,9 +44,7 @@ spec:
               protocol: UDP
           volumeMounts:
             - name: game-data
-              mountPath: /satisfactory/config
-            - name: game-data
-              mountPath: /satisfactory/config/gamefiles
+              mountPath: /config
       volumes:
         - name: game-data
           persistentVolumeClaim:
