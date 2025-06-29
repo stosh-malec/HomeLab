@@ -20,4 +20,4 @@ alias home='kubectl config use-context home'
 alias krh="kubectl rollout restart deployment"
 alias krs="kubectl rollout restart statefulset"
 alias krd="kubectl rollout restart daemonset"
-alias showalias="grep '^alias' ~/.zshrc || grep '^alias' ~/.bashrc"
+alias showalias="grep '^alias' ~/.zshrc-aliases"
