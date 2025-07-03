@@ -12,7 +12,7 @@ Here's a list of the applications currently running in my homelab:
     * Experimental statefull set with persistance
 * **Longhorn:**
     * A HA distributed storage system for Kubernetes.
-    * Automatic Cloud Backups
+    * Automatic Cloud Backups to GCP
 * **Twingate:**
     * Enables secure, limited access to internal applications/game servers for myself and friends
 
@@ -25,7 +25,35 @@ Here's a list of the applications currently running in my homelab:
 
 # Terraform
 
-The terraform directory contains configurations for cloud infrastructure utilized by the Homelab.
+The terraform directory contains configurations for cloud infrastructure and Kubernetes deployments utilized by the Homelab.
+
+## Terraform Modules
+
+### Homelab Kubernetes Deployments
+
+The `terraform/roots/homelab` directory contains Terraform configurations for deploying applications to the Kubernetes cluster:
+
+* **Minecraft Server:** Deploys a Minecraft server with modpacks and persistent storage
+* **Satisfactory Server:** Deploys a dedicated Satisfactory game server
+
+To deploy applications to the Kubernetes cluster:
+
+```bash
+cd ./terraform/roots/homelab/
+
+# Initialize Terraform
+terraform init
+
+# Plan the changes
+terraform plan
+
+# Apply the changes
+terraform apply
+```
+
+### GCP Cloud Storage for Backups
+
+The `terraform/roots/gcp` directory contains configurations for cloud infrastructure like backup storage.
 
 ## Setup
 
@@ -68,7 +96,3 @@ cp terraform.tfvars.example terraform.tfvars
 # Apply the changes
 ./tf apply
 ```
-
-## Maintenance
-
-The bucket is configured with a lifecycle rule to automatically delete backups older than 30 days. 
