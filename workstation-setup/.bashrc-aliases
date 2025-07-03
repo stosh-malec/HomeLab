@@ -21,14 +21,25 @@ alias krs="kubectl rollout restart statefulset"
 alias krd="kubectl rollout restart daemonset"
 alias showalias="grep '^alias' ~/.zshrc-aliases"
 
-# Terraform aliases
+# Home Terragrunt aliases for GCP
 alias setuphometg='cd ~/Code/Home/Homelab/terraform && ./setup.sh'
-alias tf-setup='cd ~/Code/Home/Homelab/terraform && ./setup.sh'
-alias tf-gcp='cd ~/Code/Home/Homelab/terraform/roots/gcp && ./tf'
-alias tf-init='./tf init'
-alias tf-plan='./tf plan'
-alias tf-apply='./tf apply'
-alias tf-destroy='./tf destroy'
-alias tf-output='./tf output'
-alias tf-validate='./tf validate'
-alias tf-fmt='./tf fmt -recursive'
+alias tg-setup='cd ~/Code/Home/Homelab/terraform && ./setup.sh'
+alias tg-gcp='cd ~/Code/Home/Homelab/terraform/roots/gcp && ./tf'
+alias tg-init='./tf init'
+alias tg-plan='./tf plan'
+alias tg-apply='./tf apply'
+alias tg-destroy='./tf destroy'
+alias tg-output='./tf output'
+alias tg-validate='./tf validate'
+alias tg-fmt='./tf fmt -recursive'
+
+# Home .zshrc function for switching to home context from work laptop
+#
+# function home {
+# 	export GOOGLE_APPLICATION_CREDENTIALS=~/.config/gcloud/personal-credentials.json
+#  	kubectl config use-context home
+# 	gcloud config set account <personal-email>
+#   	echo "Switched to 'home' Kubernetes context and GCloud Auth"
+#         export AWS_PROFILE=""
+#         export AWS_DEFAULT_REGION=""
+# }
