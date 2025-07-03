@@ -70,106 +70,95 @@ variable "wait" {
   default     = true
 }
 
+# These variables are only used when values_file_path is empty
 variable "image_repository" {
-  description = "Docker image repository"
+  description = "Docker image repository (only used when values_file_path is empty)"
   type        = string
   default     = "itzg/minecraft-server"
 }
 
 variable "image_tag" {
-  description = "Docker image tag"
+  description = "Docker image tag (only used when values_file_path is empty)"
   type        = string
   default     = "latest"
 }
 
 variable "resources_limits_memory" {
-  description = "Memory limits"
+  description = "Memory limits (only used when values_file_path is empty)"
   type        = string
   default     = "10G"
 }
 
 variable "resources_limits_cpu" {
-  description = "CPU limits"
+  description = "CPU limits (only used when values_file_path is empty)"
   type        = string
   default     = "6000m"
 }
 
 variable "resources_requests_memory" {
-  description = "Memory requests"
+  description = "Memory requests (only used when values_file_path is empty)"
   type        = string
   default     = "10G"
 }
 
 variable "resources_requests_cpu" {
-  description = "CPU requests"
+  description = "CPU requests (only used when values_file_path is empty)"
   type        = string
   default     = "6000m"
 }
 
 variable "minecraft_type" {
-  description = "Type of Minecraft server"
+  description = "Type of Minecraft server (only used when values_file_path is empty)"
   type        = string
   default     = "MODRINTH"
 }
 
 variable "minecraft_version" {
-  description = "Minecraft version"
+  description = "Minecraft version (only used when values_file_path is empty)"
   type        = string
   default     = "1.21.5"
 }
 
 variable "minecraft_memory" {
-  description = "Memory allocation for Minecraft"
+  description = "Memory allocation for Minecraft (only used when values_file_path is empty)"
   type        = string
   default     = "1024M"
 }
 
 variable "difficulty" {
-  description = "Game difficulty"
+  description = "Game difficulty (only used when values_file_path is empty)"
   type        = string
   default     = "easy"
 }
 
 variable "gamemode" {
-  description = "Game mode"
+  description = "Game mode (only used when values_file_path is empty)"
   type        = string
   default     = "survival"
 }
 
 variable "motd" {
-  description = "Message of the day"
+  description = "Message of the day (only used when values_file_path is empty)"
   type        = string
   default     = "Welcome to the GoonLag MC Server"
 }
 
 variable "level_type" {
-  description = "World generation type"
+  description = "World generation type (only used when values_file_path is empty)"
   type        = string
   default     = "DEFAULT"
 }
 
 variable "level" {
-  description = "World name"
+  description = "World name (only used when values_file_path is empty)"
   type        = string
   default     = "world"
 }
 
 variable "enable_rcon" {
-  description = "Whether to enable RCON"
+  description = "Whether to enable RCON (only used when values_file_path is empty)"
   type        = bool
   default     = false
-}
-
-variable "cf_api_key_secret_name" {
-  description = "Name of the secret containing the CurseForge API key"
-  type        = string
-  default     = "minecraft-server-curseforge"
-}
-
-variable "cf_api_key_secret_key" {
-  description = "Key in the secret for the CurseForge API key"
-  type        = string
-  default     = "cf-api-key"
 }
 
 variable "cf_parallel_downloads" {
@@ -178,14 +167,8 @@ variable "cf_parallel_downloads" {
   default     = "4"
 }
 
-variable "enable_autopause" {
-  description = "Whether to enable auto-pausing the server when no players are online"
-  type        = bool
-  default     = false
-}
-
 variable "modrinth_modpack" {
-  description = "Modrinth modpack to use when TYPE is MODRINTH"
+  description = "Modrinth modpack to use when TYPE is MODRINTH (only used when values_file_path is empty)"
   type        = string
   default     = "vanilla-perfected"
 }

@@ -59,24 +59,24 @@ module "satisfactory_server" {
 module "minecraft_server" {
   source = "../../modules/minecraft"
 
-  name      = "minecraft-server"
-  namespace = kubernetes_namespace.games.metadata[0].name
+  name             = "minecraft-server"
+  namespace        = kubernetes_namespace.games.metadata[0].name
   create_namespace = false
-  
+
   # Don't create PVC since we're using an existing Longhorn volume
   create_persistent_volume_claim = false
   persistent_volume_claim_name   = "minecraft-server-datadir"
   storage_class_name             = "longhorn"
   storage_size                   = "10Gi"
-  
+
   # Chart configuration
   chart_repo    = "https://itzg.github.io/minecraft-server-charts/"
   chart_name    = "minecraft"
   chart_version = "4.26.3"
-  
+
   # Use values file instead of individual settings
   values_file_path = "${path.module}/../../../apps/mc-server/values.yaml"
-  
+
   # Wait for completion
   wait = true
 } 

@@ -17,11 +17,6 @@ resource "kubernetes_persistent_volume_claim" "data" {
       "app.kubernetes.io/name"  = "minecraft"
       "app.kubernetes.io/instance" = var.name
     }
-    annotations = {
-      "longhorn.io/volume-from-backup" = "s3://stosh-homelab-longhorn-backup@us/minecraft?backup=backup-244d3ab7af3d423f&volume=pvc-75dde028-50fa-4fbd-ab66-153f8c781f93"
-      "longhorn.io/restore-from-deleting" = "true"
-      "longhorn.io/last-applied-backup" = "backup-244d3ab7af3d423f"
-    }
   }
   
   spec {
@@ -159,14 +154,7 @@ resource "helm_release" "minecraft" {
     value = var.persistent_volume_claim_name
   }
   
-  # Curseforge config
-  dynamic "set" {
-    for_each = var.cf_api_key_secret_name != "" ? [1] : []
-    content {
-      name  = "minecraftServer.existingCurseforgeSecretName"
-      value = var.cf_api_key_secret_name
-    }
-  }
+  # Removed CurseForge config section since we're not using it
   
   set {
     name  = "minecraftServer.cfParallelDownloads"
