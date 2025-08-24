@@ -9,10 +9,9 @@ persistence:
   mountPath: /config
  
 resources:
-  limits:
-    memory: 8G
   reservations:
-    memory: 4G
+    memory: 8G
+    cpu: 4000m
  
 namespace: games
 
