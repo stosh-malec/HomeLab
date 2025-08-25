@@ -17,3 +17,4 @@ alias tgp='tg plan'
 alias krh="kubectl rollout restart deployment"
 alias krs="kubectl rollout restart statefulset"
 alias krd="kubectl rollout restart daemonset"
+alias 9="k9s"
