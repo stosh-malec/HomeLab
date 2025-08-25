@@ -32,6 +32,10 @@ terraform.rc
 # Ignore lock files
 .terraform.lock.hcl 
 
+# Ignore Terragrunt generated files
+backend.tf
+**/backend.tf
+
 # OS generated files
 .DS_Store
 .DS_Store?
