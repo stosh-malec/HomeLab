@@ -23,10 +23,25 @@ provider "helm" {
   }
 }
 
+# Deploy Longhorn first as the default storage class
+module "longhorn" {
+  source = "../../modules/longhorn"
+
+  bucket_name         = var.bucket_name
+  region              = var.region
+  gcp_access_key_id   = var.gcp_access_key_id
+  gcp_secret_access_key = var.gcp_secret_access_key
+  kube_config_path    = var.kube_config_path
+  kube_context        = var.kube_context
+}
+
 resource "kubernetes_namespace" "games" {
   metadata {
     name = "games"
   }
+  
+  # Ensure Longhorn is deployed first
+  depends_on = [module.longhorn]
 }
 
 # Deploy Satisfactory server using the module
@@ -53,6 +68,9 @@ module "satisfactory_server" {
 
   # Don't wait for completion as we're importing an existing deployment
   wait = true
+  
+  # Ensure Longhorn is deployed first
+  depends_on = [module.longhorn]
 }
 
 # Deploy Minecraft server using the module
@@ -79,4 +97,7 @@ module "minecraft_server" {
 
   # Wait for completion
   wait = true
+  
+  # Ensure Longhorn is deployed first
+  depends_on = [module.longhorn]
 } 

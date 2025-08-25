@@ -1,0 +1,13 @@
+creation_rules:
+  # For encrypting values files with environment-specific keys
+  - path_regex: terraform/roots/.*/.*\.dec\.yaml$
+    encrypted_regex: ^(data|stringData|password|token|key|secret|private)$
+    kms: ${kms_key_id}
+
+  # For encrypting sensitive environment variables
+  - path_regex: .*\.env\.dec$
+    kms: ${kms_key_id}
+
+  # Default encryption for any other files
+  - path_regex: .*\.dec\.(yaml|yml|json|env)$
+    kms: ${kms_key_id}

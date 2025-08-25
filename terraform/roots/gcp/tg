@@ -1,0 +1,9 @@
+#!/bin/bash
+# Docker-based Terragrunt wrapper to isolate from system Terraform/Terragrunt installations
+
+docker run --rm -it \
+  -v $(cd ../../../ && pwd):/workspace \
+  -v ~/.config/gcloud:/root/.config/gcloud \
+  -w /workspace/terraform/roots/gcp \
+  -e GOOGLE_APPLICATION_CREDENTIALS=/root/.config/gcloud/application_default_credentials.json \
+  alpine/terragrunt:latest "$@"

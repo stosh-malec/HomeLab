@@ -1,9 +1,0 @@
-#!/bin/bash
-# Docker-based Terraform wrapper to isolate from system Terraform installations
-
-# Force using personal credentials for this project
-docker run --rm -it \
-  -v $(cd ../../ && pwd):/terraform \
-  -v ~/.config/gcloud/personal-credentials.json:/root/.config/gcloud/application_default_credentials.json \
-  -w /terraform/roots/gcp \
-  hashicorp/terraform:latest "$@" 

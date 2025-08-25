@@ -28,4 +28,19 @@ output "kubernetes_secret_command" {
   description = "Command to create Kubernetes secret for Longhorn"
   value       = module.storage.kubernetes_secret_command
   sensitive = true
-} 
+}
+
+output "kms_keyring_name" {
+  description = "Name of the KMS keyring"
+  value       = module.kms.kms_keyring_name
+}
+
+output "kms_key_name" {
+  description = "Name of the KMS key"
+  value       = module.kms.kms_key_name
+}
+
+output "sops_kms_resource" {
+  description = "KMS resource identifier for SOPS configuration"
+  value       = module.kms.sops_kms_resource
+}

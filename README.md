@@ -1,15 +1,58 @@
 # HomeLab
 This repository contains my Homelab setup and workstation configurations. High Availability is achieved using K3s running on each node in the cluster, while Terraform manages infrastructure at the lowest level to simplify node replacement and addition. 
 
-## Terraform
+## Terraform with Terragrunt
+This repository uses Terragrunt to manage Terraform state and simplify deployment workflows.
+
+### Getting Started
+1. Install prerequisites:
+   ```bash
+   brew install terraform terragrunt sops
+   ```
+
+2. Set up environment variables:
+   ```bash
+   export TF_VAR_project_id="your-gcp-project-id"
+   export TF_VAR_bucket_name="your-gcp-bucket-name"
+   export TF_VAR_service_account_email="your-service-account@your-project.iam.gserviceaccount.com"
+   ```
+
+3. Initialize and apply GCP resources first:
+   ```bash
+   cd terraform/roots/gcp
+   ./tg init
+   ./tg apply
+   ```
+
+4. Deploy Kubernetes resources (including Longhorn as the first dependency):
+   ```bash
+   ./tg init
+   ./tg apply
+   ```
+
+### SOPS Encryption
+This repository uses SOPS with GCP KMS for encrypting sensitive files. The `.sops.yaml` file contains the configuration.
+
+To encrypt/decrypt files:
+```bash
+# Encrypt a file
+./scripts/sops-encrypt.sh encrypt path/to/file.dec.yaml
+
+# Decrypt a file
+./scripts/sops-encrypt.sh decrypt path/to/file.enc.yaml
+```
+
+## Terraform Structure
 ### Roots
 * Google Cloud Platform: `terraform/roots/gcp` 
-* On-Prem: `terraform/homelab`
+* On-Prem: `terraform/roots/homelab`
 
 ### Modules
 #### Infrastucture Tooling
 * Google Cloud Storage: `terraform/modules/gcp-storage`
     * Used for remote Persistant Volume Backups
+* Google Cloud KMS: `terraform/modules/gcp-kms`
+    * Used for SOPS encryption of sensitive files
 * Twingate: `terraform/modules/twingate`
     * Helm Deployment of Redundant Twingate Connectors
 * Longhorn: `terraform/modules/longhorn`

@@ -1,0 +1,12 @@
+#!/bin/bash
+# Docker-based Terragrunt wrapper to isolate from system Terraform/Terragrunt installations
+
+# Force using personal credentials for this project
+docker run --rm -it \
+  -v $(cd ../../../ && pwd):/workspace \
+  -v ~/.config/gcloud:/root/.config/gcloud \
+  -v ~/.kube:/root/.kube \
+  -w /workspace/terraform/roots/homelab \
+  -e GOOGLE_APPLICATION_CREDENTIALS=/root/.config/gcloud/application_default_credentials.json \
+  -e KUBECONFIG=/root/.kube/config \
+  alpine/terragrunt:latest "$@"
