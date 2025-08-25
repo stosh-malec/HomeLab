@@ -1,6 +1,5 @@
 #!/bin/bash
 # Docker-based Terragrunt wrapper to isolate from system Terraform/Terragrunt installations
-
 docker run --rm -it \
   -v $(cd ../../../ && pwd):/workspace \
   -v ~/.config/gcloud:/root/.config/gcloud \

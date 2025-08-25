@@ -1,10 +1,5 @@
 #!/bin/bash
 # Docker-based Terragrunt wrapper to isolate from system Terraform/Terragrunt installations
-
-# Default region if not set
-export TF_VAR_region=${TF_VAR_region:-"us-central1"}
-
-# Force using personal credentials for this project
 docker run --rm -it \
   -v $(cd ../../../ && pwd):/workspace \
   -v ~/.config/gcloud:/root/.config/gcloud \
@@ -16,4 +11,6 @@ docker run --rm -it \
   -e TF_VAR_bucket_name=${TF_VAR_bucket_name} \
   -e TF_VAR_region=${TF_VAR_region} \
   -e TF_VAR_service_account_email=${TF_VAR_service_account_email} \
+  -e TF_VAR_gcp_access_key_id=${TF_VAR_gcp_access_key_id} \
+  -e TF_VAR_gcp_secret_access_key=${TF_VAR_gcp_secret_access_key} \
   custom-terragrunt "$@"
