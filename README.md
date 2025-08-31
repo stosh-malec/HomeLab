@@ -66,20 +66,37 @@ Setup Two VMs for K3s
     ```
 * Unifi: Fix IPs of the Multipass VMs & Mac Mini
 
-Use K3sup to Configure Cluster on Macbook
 * Take Down Multipass Adapter over SSH to prevent K3s from binding to it over the bridged adapter
     ```bash
     sudo ip link set enp0s1 down / up
     ```
-* Grab Token from Master Node 1
+* Grab token from master node
     ```bash
     sudo cat /var/lib/rancher/k3s/server/node-token
     ```
-* To Join Control Plane to Cluster: 
+
+* Join additional control plane nodes
     ```bash
-    curl -sfL https://get.k3s.io | K3S_URL=https://<Master Node 1>:6443 K3S_TOKEN=<node-token> sh -s - server --node-ip <New Master IP> --advertise-address <New Master IP>
+    curl -sfL https://get.k3s.io | K3S_URL=https://<Master Node 1>:6443 K3S_TOKEN=<node-token> sh -s - server \
+      --node-ip=192.168.1.X \
+      --flannel-iface=enp0s2 \
+      --flannel-backend=vxlan \
+      --cluster-cidr=10.42.0.0/16 \
+      --service-cidr=10.43.0.0/16 \
+      --node-external-ip=192.168.1.X
+
+    sudo cat /var/lib/rancher/k3s/server/node-token
     ```
-* To Join Workers to the Cluster
-    ```bash 
-    curl -sfL https://get.k3s.io | K3S_URL=https://<A Master Node>:6443 K3S_TOKEN=<node-token> sh -s - agent --node-ip 192.168.1.X
+
+* Join worker nodes
+    ```bash
+    curl -sfL https://get.k3s.io | K3S_URL=https://<Master Node>:6443 K3S_TOKEN=<node-token> sh -s - agent \
+      --node-ip=192.168.1.X \
+      --flannel-iface=enp0s2 \
+      --node-external-ip=192.168.1.X
+    ```
+    
+* Check flannel VXLAN interface (should show local 192.168.1.X)
+    ```bash
+    sudo ip -d link show flannel.1 | grep local
     ```

@@ -9,7 +9,7 @@ resource "helm_release" "longhorn" {
   namespace  = kubernetes_namespace.longhorn_system.metadata[0].name
   repository = "https://charts.longhorn.io"
   chart      = "longhorn"
-  version    = "1.5.1" # Specify the desired version
+  version    = "1.9.1" # Specify the desired version
 
   # Wait for the deployment to complete
   wait = true
