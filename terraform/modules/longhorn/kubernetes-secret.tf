@@ -2,6 +2,9 @@ resource "kubernetes_secret" "gcp_backup_secret" {
   metadata {
     name      = "gcp-backup-secret"
     namespace = kubernetes_namespace.longhorn_system.metadata[0].name
+    annotations = {
+      "longhorn.io/backup-target" = "s3://${var.bucket_name}@us/backups/"
+    }
   }
 
   data = {

@@ -27,12 +27,14 @@ provider "helm" {
 module "longhorn" {
   source = "../../modules/longhorn"
 
-  bucket_name         = var.bucket_name
-  region              = var.region
-  gcp_access_key_id   = var.gcp_access_key_id
+  bucket_name           = var.bucket_name
+  region                = var.region
+  gcp_access_key_id     = var.gcp_access_key_id
   gcp_secret_access_key = var.gcp_secret_access_key
-  kube_config_path    = var.kube_config_path
-  kube_context        = var.kube_context
+  kube_config_path      = var.kube_config_path
+  kube_context          = var.kube_context
+
+  depends_on = [module.node_management]
 }
 
 
@@ -40,7 +42,7 @@ module "longhorn" {
 #   metadata {
 #     name = "games"
 #   }
-  
+
 #   # Ensure Longhorn is deployed first
 #   depends_on = [module.longhorn]
 # }
@@ -69,7 +71,7 @@ module "longhorn" {
 
 #   # Don't wait for completion as we're importing an existing deployment
 #   wait = true
-  
+
 #   # Ensure Longhorn is deployed first
 #   depends_on = [module.longhorn]
 # }
@@ -98,7 +100,7 @@ module "longhorn" {
 
 #   # Wait for completion
 #   wait = true
-  
+
 #   # Ensure Longhorn is deployed first
 #   depends_on = [module.longhorn]
 # } 

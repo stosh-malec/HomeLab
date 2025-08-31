@@ -27,7 +27,7 @@ resource "google_storage_bucket" "longhorn_backup" {
   lifecycle_rule {
     condition {
       age = 30 
-      # Don't apply this rule to terraform state files
+      # Never Delete State Files
       matches_prefix = ["backups/"]
     }
     action {

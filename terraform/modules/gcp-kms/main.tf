@@ -30,7 +30,6 @@ resource "google_kms_crypto_key" "sops_key" {
   }
 }
 
-# Grant permissions to use the key (optional)
 resource "google_kms_crypto_key_iam_binding" "sops_key_binding" {
   crypto_key_id = google_kms_crypto_key.sops_key.id
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
