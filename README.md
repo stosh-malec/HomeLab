@@ -84,8 +84,6 @@ Setup Two VMs for K3s
       --cluster-cidr=10.42.0.0/16 \
       --service-cidr=10.43.0.0/16 \
       --node-external-ip=192.168.1.X
-
-    sudo cat /var/lib/rancher/k3s/server/node-token
     ```
 
 * Join worker nodes
@@ -96,7 +94,14 @@ Setup Two VMs for K3s
       --node-external-ip=192.168.1.X
     ```
     
-* Check flannel VXLAN interface (should show local 192.168.1.X)
+* Apply taints to new Worker and Control Plane Nodes
     ```bash
-    sudo ip -d link show flannel.1 | grep local
+    for NODE in new_master_1 new_master_etc; do
+        kubectl label node $NODE node-role.kubernetes.io/control-plane=true node-type=control-plane --overwrite
+        kubectl taint node $NODE node-role.kubernetes.io/control-plane=true:NoSchedule --overwrite || true
+    done
+
+    for NODE in new_worker_1 new_worker_etc; do
+        kubectl label node $NODE node-role.kubernetes.io/worker=true node-type=worker --overwrite
+    done
     ```
