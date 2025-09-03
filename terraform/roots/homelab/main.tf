@@ -61,7 +61,10 @@ module "minecraft_server" {
   difficulty       = "easy"
   motd            = "Can't Mine without the Craft"
   node_port       = 30013
-  server_type      = "VANILLA"
+  server_type      = "MODRINTH"
+  modpack_type     = "MODRINTH"
+  modpack_name     = "vanilla-perfected"
+  modpack_version  = "1.0.1+1.21.8"
   memory_request   = "6Gi"
   cpu_request     = "2000m"
   memory_limit    = "6Gi"

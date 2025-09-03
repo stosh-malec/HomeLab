@@ -34,7 +34,14 @@ metrics:
   enabled: true
   scrapeInterval: 30s
 
-schedules: {}
+# Backup Full Games Namespace
+schedules:
+  games-backup:
+    schedule: "0 2 * * *"
+    template:
+      includedNamespaces:
+        - games
+      ttl: "720h"
 
 backupsEnabled: true
 upgradeJobResources: {}

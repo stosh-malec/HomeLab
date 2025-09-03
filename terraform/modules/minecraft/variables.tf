@@ -64,3 +64,21 @@ variable "storage_class_name" {
   type        = string
   default     = "local-path"
 }
+
+variable "modpack_type" {
+  description = "Modpack type (MODRINTH, CURSEFORGE, etc.)"
+  type        = string
+  default     = ""
+}
+
+variable "modpack_name" {
+  description = "Name of the modpack"
+  type        = string
+  default     = ""
+}
+
+variable "modpack_version" {
+  description = "Version of the modpack"
+  type        = string
+  default     = ""
+}

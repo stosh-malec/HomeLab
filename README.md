@@ -103,3 +103,28 @@ Setup Two VMs for K3s
         kubectl label node $NODE node-role.kubernetes.io/worker=true node-type=worker --overwrite
     done
     ```
+
+## Backup & Restore
+
+### Game Server Backups
+Velero automatically backs up the `games` namespace daily at 2 AM, including all Minecraft world data.
+
+### Restore Games from Backup
+```bash
+# 1. List available backups
+velero backup get
+
+# 2. Delete broken namespace (if needed)
+kubectl delete namespace games --wait=true
+
+# 3. Restore from backup
+velero restore create minecraft-restore-$(date +%Y%m%d%H%M) \
+  --from-backup games-backup-YYYYMMDD020000 \
+  --restore-volumes=true
+
+# 4. Fix PV binding (required for local-path storage)
+kubectl patch pv [PV-NAME] -p '{"spec":{"claimRef":null}}'
+
+# 5. Verify pod is running
+kubectl get pods -n games
+```

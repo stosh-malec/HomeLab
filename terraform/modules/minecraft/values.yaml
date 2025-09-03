@@ -6,6 +6,13 @@ minecraftServer:
   motd: "${motd}"
   serviceType: NodePort
   nodePort: ${node_port}
+%{ if modpack_type == "MODRINTH" }
+extraEnv:
+  MODRINTH_MODPACK: "${modpack_name}"
+  MODRINTH_MODPACK_VERSION: "${modpack_version}"
+  ENABLE_AUTOPAUSE: "FALSE"
+  REMOVE_OLD_MODS: "TRUE"
+%{ endif }
 
 resources:
   requests:
@@ -14,6 +21,9 @@ resources:
   limits:
     memory: "${memory_limit}"
     cpu: "${cpu_limit}"
+
+podAnnotations:
+  backup.velero.io/backup-volumes: "datadir"
 
 persistence:
   dataDir:
