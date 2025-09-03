@@ -10,25 +10,35 @@ variable "kube_context" {
   default     = "home"
 }
 
-variable "bucket_name" {
-  description = "Name of the GCP storage bucket for Longhorn backups"
-  type        = string
-}
-
 variable "region" {
   description = "GCP region for resources"
   type        = string
   default     = "us-central1"
 }
 
-variable "gcp_access_key_id" {
-  description = "GCP HMAC access key ID for Longhorn backups"
+variable "gcp_project_id" {
+  description = "GCP project ID for Velero"
+  type        = string
+}
+
+variable "twingate_network" {
+  description = "Twingate network name"
+  type        = string
+}
+
+variable "twingate_api_token" {
+  description = "Twingate API token with Read, Write & Provision permissions"
   type        = string
   sensitive   = true
 }
 
-variable "gcp_secret_access_key" {
-  description = "GCP HMAC secret access key for Longhorn backups"
+variable "twingate_remote_network_name" {
+  description = "Name for the Twingate remote network"
   type        = string
-  sensitive   = true
+}
+
+variable "twingate_connector_image_tag" {
+  description = "Docker image tag for Twingate connector (use 'latest' for auto-update)"
+  type        = string
+  default     = "latest"
 } 

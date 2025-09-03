@@ -1,41 +1,30 @@
-output "bucket_name" {
-  description = "The name of the GCS bucket"
-  value       = google_storage_bucket.longhorn_backup.name
+output "terraform_state_bucket_name" {
+  description = "The name of the terraform state GCS bucket"
+  value       = google_storage_bucket.terraform_state.name
 }
 
-output "bucket_url" {
-  description = "The URL of the GCS bucket"
-  value       = google_storage_bucket.longhorn_backup.url
+output "terraform_state_bucket_url" {
+  description = "The URL of the terraform state GCS bucket"
+  value       = google_storage_bucket.terraform_state.url
 }
 
-output "longhorn_backup_config" {
-  description = "Configuration string for Longhorn backup target"
-  value       = "s3://${google_storage_bucket.longhorn_backup.name}@us/"
+output "velero_backup_bucket_name" {
+  description = "The name of the velero backup GCS bucket"
+  value       = google_storage_bucket.velero_backup.name
 }
 
-output "service_account_email" {
-  description = "Email of the service account for Longhorn"
-  value       = google_service_account.longhorn_backup_sa.email
+output "velero_backup_bucket_url" {
+  description = "The URL of the velero backup GCS bucket"
+  value       = google_storage_bucket.velero_backup.url
 }
 
-output "hmac_access_id" {
-  description = "HMAC access ID for S3 compatibility"
-  value       = google_storage_hmac_key.longhorn_backup_hmac.access_id
+output "velero_backup_service_account_email" {
+  description = "Email of the service account for velero backups"
+  value       = google_service_account.velero_backup_sa.email
 }
 
-output "hmac_secret" {
-  description = "HMAC secret for S3 compatibility"
-  value       = google_storage_hmac_key.longhorn_backup_hmac.secret
-  sensitive   = true
-}
-
-output "kubernetes_secret_command" {
-  description = "Command to create Kubernetes secret for Longhorn"
-  value       = <<-EOT
-    kubectl create secret generic longhorn-gcp-backups \\
-      --namespace=longhorn-system \\
-      --from-literal=AWS_ACCESS_KEY_ID=${google_storage_hmac_key.longhorn_backup_hmac.access_id} \\
-      --from-literal=AWS_SECRET_ACCESS_KEY=${google_storage_hmac_key.longhorn_backup_hmac.secret} \\
-      --from-literal=AWS_ENDPOINTS=https://storage.googleapis.com
-  EOT
+output "velero_backup_service_account_key_json" {
+  description = "Service account key in JSON format for use with Velero"
+  value = base64decode(google_service_account_key.velero_backup_sa_key.private_key)
+  sensitive = true
 } 

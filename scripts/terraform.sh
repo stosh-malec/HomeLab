@@ -13,4 +13,7 @@ docker run --rm -it \
   -e TF_VAR_service_account_email=${TF_VAR_service_account_email} \
   -e TF_VAR_gcp_access_key_id=${TF_VAR_gcp_access_key_id} \
   -e TF_VAR_gcp_secret_access_key=${TF_VAR_gcp_secret_access_key} \
+  -e TF_VAR_twingate_network=${TF_VAR_twingate_network} \
+  -e TF_VAR_twingate_remote_network_name=${TF_VAR_twingate_remote_network_name} \
+  -e TF_VAR_twingate_api_token=${TF_VAR_twingate_api_token} \
   custom-terragrunt "$@"

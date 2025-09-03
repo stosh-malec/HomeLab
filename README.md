@@ -31,13 +31,13 @@ We use GCP KMS for encrypting and decrypting secrets.
 ### Modules
 #### Infrastucture Tooling
 * Google Cloud Storage: `terraform/modules/gcp-storage`
-    * Used for remote Persistant Volume Backups
+    * Used for remote Persistant Volume Backups & TFState
 * Google Cloud KMS: `terraform/modules/gcp-kms`
     * Used for SOPS encryption of sensitive files
 * Twingate: `terraform/modules/twingate`
     * Helm Deployment of Redundant Twingate Connectors
-* Longhorn: `terraform/modules/longhorn`
-    * Helm Deployment of Longhorn
+* Velero: `terraform/modules/velero`
+    * Helm Deployment of Velero
 #### Hosted Game Servers
 * Mincraft Modded Server: `terraform/modules/minecraft`
     * Helm Deployment of the Modded Minecraft Server

@@ -1,0 +1,23 @@
+minecraftServer:
+  eula: "TRUE"
+  version: "${minecraft_version}"
+  type: "${server_type}"
+  difficulty: "${difficulty}"
+  motd: "${motd}"
+
+resources:
+  requests:
+    memory: "${memory_request}"
+    cpu: "${cpu_request}"
+  limits:
+    memory: "${memory_limit}"
+    cpu: "${cpu_limit}"
+
+persistence:
+  dataDir:
+    enabled: true
+    existingClaim: "minecraft-server-datadir"
+
+service:
+  type: NodePort
+  nodePort: ${node_port}

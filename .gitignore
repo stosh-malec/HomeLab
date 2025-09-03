@@ -44,3 +44,6 @@ backend.tf
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Claude Code Docs
+CLAUDE.md

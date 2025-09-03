@@ -2,11 +2,15 @@ terraform {
   required_providers {
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~> 2.38"
+      version = "~> 2.38" # https://registry.terraform.io/providers/hashicorp/kubernetes/latest
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "~> 2.12.1"
+      version = "~> 3.0.2" # https://registry.terraform.io/providers/hashicorp/helm/latest
+    }
+    twingate = {
+      source  = "Twingate/twingate"
+      version = "~> 3.0" # https://registry.terraform.io/providers/Twingate/twingate/latest
     }
   }
 }
@@ -17,90 +21,68 @@ provider "kubernetes" {
 }
 
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     config_path    = var.kube_config_path
     config_context = var.kube_context
   }
 }
+data "terraform_remote_state" "gcp" {
+  backend = "gcs"
+  config = {
+    bucket = "${var.gcp_project_id}-terraform-state"
+    prefix = "terraform/gcp"
+  }
+}
+module "velero" {
+  source = "../../modules/velero"
 
-# Deploy Longhorn as the default storage class
-module "longhorn" {
-  source = "../../modules/longhorn"
-
-  bucket_name           = var.bucket_name
-  region                = var.region
-  gcp_access_key_id     = var.gcp_access_key_id
-  gcp_secret_access_key = var.gcp_secret_access_key
-  kube_config_path      = var.kube_config_path
-  kube_context          = var.kube_context
-
-  depends_on = [module.node_management]
+  gcp_project_id            = var.gcp_project_id
+  gcp_service_account_key   = data.terraform_remote_state.gcp.outputs.velero_backup_service_account_key
+  bucket_name               = data.terraform_remote_state.gcp.outputs.velero_backup_bucket_name
+  region                    = var.region
+  kube_config_path          = var.kube_config_path
+  kube_context              = var.kube_context
+  velero_chart_version      = "10.1.1" #https://artifacthub.io/packages/helm/vmware-tanzu/velero
+  velero_gcp_plugin_version = "v1.12.1" #https://github.com/vmware-tanzu/velero-plugin-for-gcp/releases
 }
 
+resource "kubernetes_namespace" "games" {
+  metadata {
+    name = "games"
+  }
+}
 
-# resource "kubernetes_namespace" "games" {
-#   metadata {
-#     name = "games"
-#   }
+module "minecraft_server" {
+  source = "../../modules/minecraft"
 
-#   # Ensure Longhorn is deployed first
-#   depends_on = [module.longhorn]
-# }
+  namespace        = kubernetes_namespace.games.metadata[0].name
+  chart_version    = "4.26.3" # https://artifacthub.io/packages/helm/minecraft-server-charts/minecraft
+  minecraft_version = "1.21.8" # https://feedback.minecraft.net/hc/en-us/sections/360001186971-Release-Changelogs
+  difficulty       = "easy"
+  motd            = "Can't Mine without the Craft"
+  node_port       = 30013
+  server_type      = "VANILLA"
+  memory_request   = "6Gi"
+  cpu_request     = "2000m"
+  memory_limit    = "6Gi"
+  cpu_limit       = "2000m"
+  storage_size    = "20Gi"
+} 
 
-# # Deploy Satisfactory server using the module
-# module "satisfactory_server" {
-#   source = "../../modules/satisfactory"
-
-#   name      = "satisfactory-server"
-#   namespace = kubernetes_namespace.games.metadata[0].name
-
-#   # Use the existing PVC
-#   create_persistent_volume_claim = false
-#   persistent_volume_claim_name   = "satisfactory-files"
-#   storage_class_name             = "longhorn-static"
-#   storage_size                   = "20Gi"
-
-#   # Specify the chart path to use the custom Helm chart
-#   chart_path = "satisfactory-server"
-
-#   # Server configuration
-#   max_players = 4
-#   steambeta   = false
-#   debug       = "false"
-#   skip_update = "false"
-
-#   # Don't wait for completion as we're importing an existing deployment
-#   wait = true
-
-#   # Ensure Longhorn is deployed first
-#   depends_on = [module.longhorn]
-# }
-
-# # Deploy Minecraft server using the module
-# module "minecraft_server" {
-#   source = "../../modules/minecraft"
-
-#   name             = "minecraft-server"
-#   namespace        = kubernetes_namespace.games.metadata[0].name
-#   create_namespace = false
-
-#   # Don't create PVC since we're using an existing Longhorn volume
-#   create_persistent_volume_claim = false
-#   persistent_volume_claim_name   = "minecraft-server-datadir"
-#   storage_class_name             = "longhorn"
-#   storage_size                   = "10Gi"
-
-#   # Chart configuration
-#   chart_repo    = "https://itzg.github.io/minecraft-server-charts/"
-#   chart_name    = "minecraft"
-#   chart_version = "4.26.3"
-
-#   # Use values file instead of individual settings
-#   values_file_path = "${path.module}/../../../apps/mc-server/values.yaml"
-
-#   # Wait for completion
-#   wait = true
-
-#   # Ensure Longhorn is deployed first
-#   depends_on = [module.longhorn]
-# } 
+module "twingate" {
+  source = "../../modules/twingate"
+  
+  namespace           = "twingate"
+  network             = var.twingate_network
+  api_token           = var.twingate_api_token
+  remote_network_name = var.twingate_remote_network_name
+  connector_image_tag = var.twingate_connector_image_tag
+  
+  node1_selector = {
+    "kubernetes.io/hostname" = "k3s-worker-2"
+  }
+  
+  node2_selector = {
+    "kubernetes.io/hostname" = "k3s-worker-slim"
+  }
+}

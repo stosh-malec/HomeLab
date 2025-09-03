@@ -9,7 +9,7 @@ variable "region" {
   default     = "us-central1"
 }
 
-variable "bucket_name" {
-  description = "Name of the GCP storage bucket for Longhorn backups"
+variable "velero_bucket_name" {
+  description = "Name of the GCP storage bucket for Velero backups"
   type        = string
 } 

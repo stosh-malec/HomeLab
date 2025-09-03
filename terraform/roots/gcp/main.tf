@@ -2,7 +2,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 5.45"
+      version = "~> 7.1.0" # https://registry.terraform.io/providers/hashicorp/google/latest
     }
   }
 }
@@ -15,17 +15,14 @@ provider "google" {
 module "storage" {
   source = "../../modules/gcp-storage"
 
-  project_id  = var.project_id
-  region      = var.region
-  bucket_name = var.bucket_name
-} 
+  project_id          = var.project_id
+  region              = var.region
+  velero_bucket_name  = var.velero_bucket_name
+}
 
 module "kms" {
   source = "../../modules/gcp-kms"
 
-  project_id           = var.project_id
-  region               = var.region
-  keyring_name         = var.keyring_name
-  key_name             = var.key_name
-  service_account_email = var.service_account_email
+  project_id = var.project_id
+  region     = var.region
 }
