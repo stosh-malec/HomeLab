@@ -4,6 +4,8 @@ minecraftServer:
   type: "${server_type}"
   difficulty: "${difficulty}"
   motd: "${motd}"
+  serviceType: NodePort
+  nodePort: ${node_port}
 
 resources:
   requests:
@@ -17,7 +19,3 @@ persistence:
   dataDir:
     enabled: true
     existingClaim: "minecraft-server-datadir"
-
-service:
-  type: NodePort
-  nodePort: ${node_port}
