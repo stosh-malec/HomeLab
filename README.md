@@ -39,10 +39,8 @@ We use GCP KMS for encrypting and decrypting secrets.
 * Velero: `terraform/modules/velero`
     * Helm Deployment of Velero
 #### Hosted Game Servers
-* Mincraft Modded Server: `terraform/modules/minecraft`
-    * Helm Deployment of the Modded Minecraft Server
-* Satisfactory Experimental: `terraform/modules/satisfactory`
-    * Helm Deployment of the Satisfactory Experimental Server
+* Mincraft Server: `terraform/modules/minecraft`
+    * Helm Deployment of the Minecraft Server
 
 ## Hardware
 * 2x m4 Mac Mini's
