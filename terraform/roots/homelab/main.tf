@@ -65,9 +65,9 @@ module "minecraft_server" {
   modpack_type     = "MODRINTH"
   modpack_name     = "vanilla-perfected"
   modpack_version  = "1.0.1+1.21.8"
-  memory_request   = "6Gi"
+  memory_request   = "8Gi"
   cpu_request     = "2000m"
-  memory_limit    = "6Gi"
+  memory_limit    = "8Gi"
   cpu_limit       = "2000m"
   storage_size    = "20Gi"
 } 
