@@ -1,0 +1,12 @@
+#!/bin/bash
+# Docker-based Terragrunt wrapper to isolate from system Terraform/Terragrunt installations
+docker run --rm -it \
+  -v $(cd ../../../ && pwd):/workspace \
+  -v ~/.config/gcloud:/root/.config/gcloud \
+  -w /workspace/terraform/roots/gcp \
+  -e GOOGLE_APPLICATION_CREDENTIALS=/root/.config/gcloud/application_default_credentials.json \
+  -e TF_VAR_project_id=${TF_VAR_project_id} \
+  -e TF_VAR_bucket_name=${TF_VAR_bucket_name} \
+  -e TF_VAR_region=${TF_VAR_region} \
+  -e TF_VAR_service_account_email=${TF_VAR_service_account_email} \
+  custom-terragrunt "$@"

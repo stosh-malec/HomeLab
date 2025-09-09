@@ -1,98 +1,130 @@
 # HomeLab
+This repository contains my Homelab setup and workstation configurations. High Availability is achieved using K3s running on each node in the cluster, while Terraform manages infrastructure at the lowest level to simplify node replacement and addition. 
 
-This repository contains Homelab deployments and personal workstation setups
+## Terraform Apply's
+To ensure compatibility, docker containers are used to isolate terraform and terragrunt versions.
 
-## Applications
+* To apply use
+   ```bash
+   cd terraform/roots/gcp
+   ./tg init
+   ./tg apply
+   ```
 
-Here's a list of the applications currently running in my homelab:
+### Encryption
+We use GCP KMS for encrypting and decrypting secrets. 
 
-* **Minecraft Server:**
-    * Vanilla+ 
-* **Satisfactory Server:**
-    * Experimental statefull set with persistance
-* **Longhorn:**
-    * A HA distributed storage system for Kubernetes.
-    * Automatic Cloud Backups to GCP
-* **Twingate:**
-    * Enables secure, limited access to internal applications/game servers for myself and friends
+* To encrypt/decrypt files:
+    ```bash
+    # Encrypt a file
+    ./scripts/sops.sh encrypt <output-file> <encrypted-file>
+
+    # Decrypt a file
+    ./scripts/sops.sh decrypt <encrypted-file> <output-file>
+    ```
+
+## Terraform Structure
+### Roots
+* Google Cloud Platform: `terraform/roots/gcp` 
+* On-Prem: `terraform/roots/homelab`
+
+### Modules
+#### Infrastucture Tooling
+* Google Cloud Storage: `terraform/modules/gcp-storage`
+    * Used for remote Persistant Volume Backups & TFState
+* Google Cloud KMS: `terraform/modules/gcp-kms`
+    * Used for SOPS encryption of sensitive files
+* Twingate: `terraform/modules/twingate`
+    * Helm Deployment of Redundant Twingate Connectors
+* Velero: `terraform/modules/velero`
+    * Helm Deployment of Velero
+#### Hosted Game Servers
+* Mincraft Server: `terraform/modules/minecraft`
+    * Helm Deployment of the Minecraft Server
 
 ## Hardware
-
-* Kubernetes cluster running on 3 single board computers.
-    * Each node is equipped with an Intel i9 processor, 16GB DDR4 RAM, and a 1TB NVMe SSDs.
+* 2x m4 Mac Mini's
 * Unifi Dream Machine, Unfi Comcast Modem, Unifi PoE Switches, U7 APs
 
+### New Hardware Setup
+Do not enable File-Vault. Login with AppleID, Enable User Auto-Login, Enable Remote Management, Disable Sleep, and Enable Automatic Startup.
 
-# Terraform
+Setup Two VMs for K3s
+* On-Macbook 
+    ```bash
+    `ssh-keygen -t rsa -b 4096 && cat ~/.ssh/id_rsa.pub`
+    ```
+* On-Mac-Mini 
+    ```bash
+    echo "PASTE_THE_PUBLIC_KEY_HERE" > ~/.ssh/my-macbook-key.pub
 
-The terraform directory contains configurations for cloud infrastructure and Kubernetes deployments utilized by the Homelab.
+    multipass launch --name k3s-master-X --cpus 1 --memory 1G --disk 20G  --network en0 --cloud-init <(echo "users: [{name: ubuntu, ssh_authorized_keys: [\"$(cat ~/.ssh/my-macbook-key.pub)\"]}]")
+    
+    multipass launch --name k3s-worker-X --cpus 7 --memory 13G --disk 150G --network en0 --cloud-init <(echo "users: [{name: ubuntu, ssh_authorized_keys: [\"$(cat ~/.ssh/my-macbook-key.pub)\"]}]")
+    ```
+* Unifi: Fix IPs of the Multipass VMs & Mac Mini
 
-## Terraform Modules
+* Take Down Multipass Adapter over SSH to prevent K3s from binding to it over the bridged adapter
+    ```bash
+    sudo ip link set enp0s1 down / up
+    ```
+* Grab token from master node
+    ```bash
+    sudo cat /var/lib/rancher/k3s/server/node-token
+    ```
 
-### Homelab Kubernetes Deployments
+* Join additional control plane nodes
+    ```bash
+    curl -sfL https://get.k3s.io | K3S_URL=https://<Master Node 1>:6443 K3S_TOKEN=<node-token> sh -s - server \
+      --node-ip=192.168.1.X \
+      --flannel-iface=enp0s2 \
+      --flannel-backend=vxlan \
+      --cluster-cidr=10.42.0.0/16 \
+      --service-cidr=10.43.0.0/16 \
+      --node-external-ip=192.168.1.X
+    ```
 
-The `terraform/roots/homelab` directory contains Terraform configurations for deploying applications to the Kubernetes cluster:
+* Join worker nodes
+    ```bash
+    curl -sfL https://get.k3s.io | K3S_URL=https://<Master Node>:6443 K3S_TOKEN=<node-token> sh -s - agent \
+      --node-ip=192.168.1.X \
+      --flannel-iface=enp0s2 \
+      --node-external-ip=192.168.1.X
+    ```
+    
+* Apply taints to new Worker and Control Plane Nodes
+    ```bash
+    for NODE in new_master_1 new_master_etc; do
+        kubectl label node $NODE node-role.kubernetes.io/control-plane=true node-type=control-plane --overwrite
+        kubectl taint node $NODE node-role.kubernetes.io/control-plane=true:NoSchedule --overwrite || true
+    done
 
-* **Minecraft Server:** Deploys a Minecraft server with modpacks and persistent storage
-* **Satisfactory Server:** Deploys a dedicated Satisfactory game server
+    for NODE in new_worker_1 new_worker_etc; do
+        kubectl label node $NODE node-role.kubernetes.io/worker=true node-type=worker --overwrite
+    done
+    ```
 
-To deploy applications to the Kubernetes cluster:
+## Backup & Restore
 
+### Game Server Backups
+Velero automatically backs up the `games` namespace daily at 2 AM, including all Minecraft world data.
+
+### Restore Games from Backup
 ```bash
-cd ./terraform/roots/homelab/
+# 1. List available backups
+velero backup get
 
-# Initialize Terraform
-terraform init
+# 2. Delete broken namespace (if needed)
+kubectl delete namespace games --wait=true
 
-# Plan the changes
-terraform plan
+# 3. Restore from backup
+velero restore create minecraft-restore-$(date +%Y%m%d%H%M) \
+  --from-backup games-backup-YYYYMMDD020000 \
+  --restore-volumes=true
 
-# Apply the changes
-terraform apply
-```
+# 4. Fix PV binding (required for local-path storage)
+kubectl patch pv [PV-NAME] -p '{"spec":{"claimRef":null}}'
 
-### GCP Cloud Storage for Backups
-
-The `terraform/roots/gcp` directory contains configurations for cloud infrastructure like backup storage.
-
-## Setup
-
-1. Ensure Docker is installed on your system
-2. Run the setup script:
-   ```bash
-   ./terraform/roots/gcp/setup.sh
-   ```
-
-## GCP Authentication
-
-1. Install the gcloud CLI if not already installed
-2. Authenticate with your Google account:
-   ```bash
-   gcloud auth login
-   ```
-3. Set your project:
-   ```bash
-   gcloud config set project your-project-id
-   ```
-
-## Usage
-
-Navigate to the gcp-backup directory and use the wrapper script to run Terraform commands:
-
-```bash
-cd ./terraform/roots/gcp/
-
-# Copy and edit the variables file
-cp terraform.tfvars.example terraform.tfvars
-
-# Edit terraform.tfvars with your GCP project information
-
-# Initialize Terraform
-./tf init
-
-# Plan the changes
-./tf plan
-
-# Apply the changes
-./tf apply
+# 5. Verify pod is running
+kubectl get pods -n games
 ```

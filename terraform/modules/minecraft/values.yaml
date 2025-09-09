@@ -1,0 +1,89 @@
+minecraftServer:
+  eula: "TRUE"
+  version: "${minecraft_version}"
+  type: "${server_type}"
+  difficulty: "${difficulty}"
+  motd: "${motd}"
+  serviceType: NodePort
+  nodePort: ${node_port}
+%{ if modpack_type == "MODRINTH" }
+extraEnv:
+  MODRINTH_MODPACK: "${modpack_name}"
+  MODRINTH_MODPACK_VERSION: "${modpack_version}"
+  ENABLE_AUTOPAUSE: "FALSE"
+  REMOVE_OLD_MODS: "TRUE"
+%{ endif }
+
+resources:
+  requests:
+    memory: "${memory_request}"
+    cpu: "${cpu_request}"
+  limits:
+    memory: "${memory_limit}"
+    cpu: "${cpu_limit}"
+
+podAnnotations:
+  backup.velero.io/backup-volumes: "datadir"
+
+persistence:
+  dataDir:
+    enabled: true
+    existingClaim: "minecraft-server-datadir"
+
+extraDeploy:
+  - apiVersion: batch/v1
+    kind: CronJob
+    metadata:
+      name: minecraft-server-restart
+      namespace: ${namespace}
+    spec:
+      schedule: "0 6 * * *"  # 6 AM daily
+      timeZone: "America/Denver"  # MST/MDT
+      jobTemplate:
+        spec:
+          template:
+            spec:
+              serviceAccountName: minecraft-restart
+              containers:
+              - name: kubectl-restart
+                image: bitnami/kubectl:latest
+                command:
+                - /bin/sh
+                - -c
+                - |
+                  echo "Restarting minecraft-server deployment at $(date)"
+                  kubectl rollout restart deployment/minecraft-server -n ${namespace}
+                  kubectl rollout status deployment/minecraft-server -n ${namespace} --timeout=300s
+                  echo "Restart completed at $(date)"
+              restartPolicy: OnFailure
+          backoffLimit: 3
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: minecraft-restart
+      namespace: ${namespace}
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      name: minecraft-restart
+      namespace: ${namespace}
+    rules:
+    - apiGroups: ["apps"]
+      resources: ["deployments"]
+      verbs: ["get", "patch"]
+    - apiGroups: ["apps"]
+      resources: ["replicasets"]
+      verbs: ["get", "list"]
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: minecraft-restart
+      namespace: ${namespace}
+    subjects:
+    - kind: ServiceAccount
+      name: minecraft-restart
+      namespace: ${namespace}
+    roleRef:
+      kind: Role
+      name: minecraft-restart
+      apiGroup: rbac.authorization.k8s.io

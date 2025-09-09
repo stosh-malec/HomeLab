@@ -1,0 +1,54 @@
+image:
+  repository: velero/velero
+  tag: "latest"
+
+initContainers:
+  - name: velero-plugin-for-gcp
+    image: velero/velero-plugin-for-gcp:${velero_gcp_plugin_version}
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+
+configuration:
+  backupStorageLocation:
+    - name: default
+      provider: gcp
+      bucket: "${bucket_name}"
+  
+  volumeSnapshotLocation:
+    - name: default
+      provider: gcp
+      config:
+        project: "${gcp_project_id}"
+
+credentials:
+  existingSecret: cloud-credentials
+
+snapshotsEnabled: true
+deployNodeAgent: true
+
+nodeAgent:
+  privileged: true
+
+metrics:
+  enabled: true
+  scrapeInterval: 30s
+
+# Backup Full Games Namespace
+schedules:
+  games-backup:
+    schedule: "0 2 * * *"
+    template:
+      includedNamespaces:
+        - games
+      ttl: "720h"
+
+backupsEnabled: true
+upgradeJobResources: {}
+
+kubectl:
+  image:
+    repository: docker.io/bitnami/kubectl
+    tag: "latest"
+
+cleanUpCRDs: false

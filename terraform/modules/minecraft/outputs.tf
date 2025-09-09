@@ -10,5 +10,5 @@ output "namespace" {
 
 output "persistent_volume_claim_name" {
   description = "Name of the persistent volume claim"
-  value       = var.persistent_volume_claim_name
+  value       = kubernetes_persistent_volume_claim.minecraft_data.metadata[0].name
 } 
