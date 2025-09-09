@@ -51,6 +51,7 @@ resource "helm_release" "minecraft" {
       modpack_type     = var.modpack_type
       modpack_name     = var.modpack_name
       modpack_version  = var.modpack_version
+      namespace        = var.namespace
     })
   ]
 

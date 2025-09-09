@@ -29,3 +29,61 @@ persistence:
   dataDir:
     enabled: true
     existingClaim: "minecraft-server-datadir"
+
+extraDeploy:
+  - apiVersion: batch/v1
+    kind: CronJob
+    metadata:
+      name: minecraft-server-restart
+      namespace: ${namespace}
+    spec:
+      schedule: "0 6 * * *"  # 6 AM daily
+      timeZone: "America/Denver"  # MST/MDT
+      jobTemplate:
+        spec:
+          template:
+            spec:
+              serviceAccountName: minecraft-restart
+              containers:
+              - name: kubectl-restart
+                image: bitnami/kubectl:latest
+                command:
+                - /bin/sh
+                - -c
+                - |
+                  echo "Restarting minecraft-server deployment at $(date)"
+                  kubectl rollout restart deployment/minecraft-server -n ${namespace}
+                  kubectl rollout status deployment/minecraft-server -n ${namespace} --timeout=300s
+                  echo "Restart completed at $(date)"
+              restartPolicy: OnFailure
+          backoffLimit: 3
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: minecraft-restart
+      namespace: ${namespace}
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      name: minecraft-restart
+      namespace: ${namespace}
+    rules:
+    - apiGroups: ["apps"]
+      resources: ["deployments"]
+      verbs: ["get", "patch"]
+    - apiGroups: ["apps"]
+      resources: ["replicasets"]
+      verbs: ["get", "list"]
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: minecraft-restart
+      namespace: ${namespace}
+    subjects:
+    - kind: ServiceAccount
+      name: minecraft-restart
+      namespace: ${namespace}
+    roleRef:
+      kind: Role
+      name: minecraft-restart
+      apiGroup: rbac.authorization.k8s.io
