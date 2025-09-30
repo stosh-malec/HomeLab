@@ -46,7 +46,7 @@ extraDeploy:
               serviceAccountName: minecraft-restart
               containers:
               - name: kubectl-restart
-                image: bitnami/kubectl:latest
+                image: rancher/kubectl:v1.30.2
                 command:
                 - /bin/sh
                 - -c
