@@ -58,7 +58,7 @@ module "minecraft_server" {
   namespace        = kubernetes_namespace.games.metadata[0].name
   chart_version    = "4.26.3" # https://artifacthub.io/packages/helm/minecraft-server-charts/minecraft
   minecraft_version = "1.21.8" # https://feedback.minecraft.net/hc/en-us/sections/360001186971-Release-Changelogs
-  difficulty       = "easy"
+  difficulty       = "normal"
   motd            = "Can't Mine without the Craft"
   node_port       = 30013
   server_type      = "MODRINTH"
