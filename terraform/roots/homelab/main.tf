@@ -12,6 +12,10 @@ terraform {
       source  = "Twingate/twingate"
       version = "~> 3.0" # https://registry.terraform.io/providers/Twingate/twingate/latest
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6" # https://registry.terraform.io/providers/hashicorp/random/latest
+    }
   }
 }
 
@@ -57,19 +61,25 @@ module "minecraft_server" {
 
   namespace        = kubernetes_namespace.games.metadata[0].name
   chart_version    = "4.26.3" # https://artifacthub.io/packages/helm/minecraft-server-charts/minecraft
-  minecraft_version = "1.21.8" # https://feedback.minecraft.net/hc/en-us/sections/360001186971-Release-Changelogs
+  minecraft_version = "1.21.10" # https://feedback.minecraft.net/hc/en-us/sections/360001186971-Release-Changelogs
   difficulty       = "normal"
   motd            = "Can't Mine without the Craft"
   node_port       = 30013
   server_type      = "MODRINTH"
   modpack_type     = "MODRINTH"
   modpack_name     = "vanilla-perfected"
-  modpack_version  = "1.0.1+1.21.8"
+  modpack_version  = "1.0.2+1.21.10"
   memory_request   = "8Gi"
   cpu_request     = "2000m"
   memory_limit    = "8Gi"
   cpu_limit       = "2000m"
   storage_size    = "20Gi"
+
+  # World backup to GCS
+  backup_enabled          = true
+  backup_interval         = "24h"
+  backup_bucket_name      = data.terraform_remote_state.gcp.outputs.velero_backup_bucket_name
+  gcp_service_account_key = data.terraform_remote_state.gcp.outputs.velero_backup_service_account_key
 } 
 
 module "twingate" {

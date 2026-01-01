@@ -82,3 +82,28 @@ variable "modpack_version" {
   type        = string
   default     = ""
 }
+
+variable "backup_enabled" {
+  description = "Enable mcbackup sidecar for world backups"
+  type        = bool
+  default     = false
+}
+
+variable "backup_interval" {
+  description = "Backup interval (e.g., 24h, 12h)"
+  type        = string
+  default     = "24h"
+}
+
+variable "backup_bucket_name" {
+  description = "GCS bucket name for backups"
+  type        = string
+  default     = ""
+}
+
+variable "gcp_service_account_key" {
+  description = "GCP service account key JSON for bucket access"
+  type        = string
+  sensitive   = true
+  default     = ""
+}

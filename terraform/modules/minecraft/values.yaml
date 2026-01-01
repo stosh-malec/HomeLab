@@ -6,6 +6,10 @@ minecraftServer:
   motd: "${motd}"
   serviceType: NodePort
   nodePort: ${node_port}
+  rcon:
+    enabled: true
+    existingSecret: minecraft-server-rcon
+    secretKey: rcon-password
 %{ if modpack_type == "MODRINTH" }
 extraEnv:
   MODRINTH_MODPACK: "${modpack_name}"
@@ -24,6 +28,20 @@ resources:
 
 podAnnotations:
   backup.velero.io/backup-volumes: "datadir"
+
+%{ if backup_enabled }
+mcbackup:
+  enabled: true
+  backupInterval: "${backup_interval}"
+  initialDelay: "5m"
+  pauseIfNoPlayers: "true"
+  backupMethod: rclone
+  rcloneRemote: "gcs"
+  rcloneDestDir: "${backup_bucket_name}/minecraft-world-backups"
+  rcloneCompressMethod: "gzip"
+  pruneBackupsDays: 7
+  rcloneConfigExistingSecret: minecraft-server-rclone-config
+%{ endif }
 
 persistence:
   dataDir:
