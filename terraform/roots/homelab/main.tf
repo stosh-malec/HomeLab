@@ -63,12 +63,12 @@ module "minecraft_server" {
   chart_version    = "4.26.3" # https://artifacthub.io/packages/helm/minecraft-server-charts/minecraft
   minecraft_version = "1.21.10" # https://feedback.minecraft.net/hc/en-us/sections/360001186971-Release-Changelogs
   difficulty       = "normal"
-  motd            = "Can't Mine without the Craft"
+  motd            = "2026 Minecraft Hits Diff"
   node_port       = 30013
   server_type      = "MODRINTH"
   modpack_type     = "MODRINTH"
   modpack_name     = "vanilla-perfected"
-  modpack_version  = "1.0.2+1.21.10"
+  modpack_version  = "1.0.0+1.21.10"
   memory_request   = "8Gi"
   cpu_request     = "2000m"
   memory_limit    = "8Gi"

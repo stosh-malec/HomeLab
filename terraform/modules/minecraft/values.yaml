@@ -26,8 +26,7 @@ resources:
     memory: "${memory_limit}"
     cpu: "${cpu_limit}"
 
-podAnnotations:
-  backup.velero.io/backup-volumes: "datadir"
+podAnnotations: {}
 
 %{ if backup_enabled }
 mcbackup:
