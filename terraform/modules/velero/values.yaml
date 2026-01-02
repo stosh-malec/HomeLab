@@ -34,14 +34,8 @@ metrics:
   enabled: true
   scrapeInterval: 30s
 
-# Backup Full Games Namespace
-schedules:
-  games-backup:
-    schedule: "0 2 * * *"
-    template:
-      includedNamespaces:
-        - games
-      ttl: "720h"
+# No scheduled backups - minecraft uses mcbackup sidecar for world backups to GCS
+schedules: {}
 
 backupsEnabled: true
 upgradeJobResources: {}

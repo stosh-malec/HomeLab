@@ -21,7 +21,10 @@ resource "helm_release" "velero" {
   chart      = "velero"
   namespace  = kubernetes_namespace.velero.metadata[0].name
   version    = var.velero_chart_version
-  
+
+  # Skip CRD upgrade hooks - they fail on ARM64 and CRDs are already installed
+  disable_webhooks = true
+
   values = [
     templatefile("${path.module}/values.yaml", {
       bucket_name              = var.bucket_name
