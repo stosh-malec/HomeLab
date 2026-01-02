@@ -68,7 +68,7 @@ module "minecraft_server" {
   server_type      = "MODRINTH"
   modpack_type     = "MODRINTH"
   modpack_name     = "vanilla-perfected"
-  modpack_version  = "1.0.0+1.21.10"
+  modpack_version  = "1.0.2+1.21.10"
   memory_request   = "8Gi"
   cpu_request     = "2000m"
   memory_limit    = "8Gi"
