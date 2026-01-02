@@ -16,6 +16,8 @@ extraEnv:
   MODRINTH_MODPACK_VERSION: "${modpack_version}"
   ENABLE_AUTOPAUSE: "FALSE"
   REMOVE_OLD_MODS: "TRUE"
+  MODRINTH_FORCE_SYNCHRONIZE: "TRUE"
+  MODRINTH_EXCLUDE_FILES: "simple-datapacks"
 %{ endif }
 
 resources:
