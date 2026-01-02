@@ -46,8 +46,8 @@ module "velero" {
   region                    = var.region
   kube_config_path          = var.kube_config_path
   kube_context              = var.kube_context
-  velero_chart_version      = "10.1.1" #https://artifacthub.io/packages/helm/vmware-tanzu/velero
-  velero_gcp_plugin_version = "v1.12.1" #https://github.com/vmware-tanzu/velero-plugin-for-gcp/releases
+  velero_chart_version      = "11.3.1" #https://artifacthub.io/packages/helm/vmware-tanzu/velero
+  velero_gcp_plugin_version = "v1.13.1" #https://github.com/vmware-tanzu/velero-plugin-for-gcp/releases
 }
 
 resource "kubernetes_namespace" "games" {
@@ -60,7 +60,7 @@ module "minecraft_server" {
   source = "../../modules/minecraft"
 
   namespace        = kubernetes_namespace.games.metadata[0].name
-  chart_version    = "4.26.3" # https://artifacthub.io/packages/helm/minecraft-server-charts/minecraft
+  chart_version    = "5.0.0" # https://artifacthub.io/packages/helm/minecraft-server-charts/minecraft
   minecraft_version = "1.21.10" # https://feedback.minecraft.net/hc/en-us/sections/360001186971-Release-Changelogs
   difficulty       = "normal"
   motd            = "2026 Minecraft Hits Diff"
