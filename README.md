@@ -1,15 +1,29 @@
 # HomeLab
 This repository contains my Homelab setup and workstation configurations. High Availability is achieved using K3s running on each node in the cluster, while Terraform manages infrastructure at the lowest level to simplify node replacement and addition. 
 
-## Terraform Apply's
-To ensure compatibility, docker containers are used to isolate terraform and terragrunt versions.
+## Terraform
 
-* To apply use
-   ```bash
-   cd terraform/roots/gcp
-   ./tg init
-   ./tg apply
-   ```
+### Prerequisites
+```bash
+# Install terraform
+brew install terraform
+
+# Load environment variables (contains Twingate API token, etc.)
+source .env
+```
+
+### Apply Infrastructure
+```bash
+# GCP resources (must be applied first - homelab depends on its outputs)
+cd terraform/roots/gcp
+terraform init
+terraform apply
+
+# Homelab Kubernetes resources
+cd terraform/roots/homelab
+terraform init
+terraform apply
+```
 
 ### Encryption
 We use GCP KMS for encrypting and decrypting secrets. 
@@ -106,25 +120,62 @@ Setup Two VMs for K3s
 
 ## Backup & Restore
 
-### Game Server Backups
-Velero automatically backs up the `games` namespace daily at 2 AM, including all Minecraft world data.
+### Minecraft World Backups
+The mcbackup sidecar automatically backs up Minecraft world data to GCS every 24 hours.
 
-### Restore Games from Backup
+- **Storage:** `gs://stosh-homelab-velero-backup/minecraft-world-backups/`
+- **Format:** Compressed `.tgz` files
+- **Retention:** 7 days (auto-pruned)
+
+### List Backups
 ```bash
-# 1. List available backups
-velero backup get
+gsutil ls gs://stosh-homelab-velero-backup/minecraft-world-backups/
+```
 
-# 2. Delete broken namespace (if needed)
-kubectl delete namespace games --wait=true
+### Restore Minecraft World
+```bash
+# 1. Scale down minecraft
+kubectl scale deployment minecraft-server -n games --replicas=0
 
-# 3. Restore from backup
-velero restore create minecraft-restore-$(date +%Y%m%d%H%M) \
-  --from-backup games-backup-YYYYMMDD020000 \
-  --restore-volumes=true
+# 2. Download the backup you want
+gsutil cp gs://stosh-homelab-velero-backup/minecraft-world-backups/world-YYYYMMDD-HHMMSS.tgz .
 
-# 4. Fix PV binding (required for local-path storage)
-kubectl patch pv [PV-NAME] -p '{"spec":{"claimRef":null}}'
+# 3. Create a debug pod to access the PVC
+kubectl run mc-restore -n games --image=busybox --restart=Never --overrides='
+{
+  "spec": {
+    "containers": [{
+      "name": "mc-restore",
+      "image": "busybox",
+      "command": ["sleep", "3600"],
+      "volumeMounts": [{
+        "name": "datadir",
+        "mountPath": "/data"
+      }]
+    }],
+    "volumes": [{
+      "name": "datadir",
+      "persistentVolumeClaim": {
+        "claimName": "minecraft-server-datadir"
+      }
+    }]
+  }
+}'
 
-# 5. Verify pod is running
+# 4. Copy and extract backup
+kubectl cp world-YYYYMMDD-HHMMSS.tgz games/mc-restore:/tmp/
+kubectl exec -n games mc-restore -- tar -xzf /tmp/world-YYYYMMDD-HHMMSS.tgz -C /data
+
+# 5. Cleanup and scale back up
+kubectl delete pod mc-restore -n games
+kubectl scale deployment minecraft-server -n games --replicas=1
+
+# 6. Verify pod is running
 kubectl get pods -n games
+```
+
+### Velero (Ad-hoc Use)
+Velero is installed but has no scheduled backups. Use for ad-hoc full namespace backups if needed:
+```bash
+velero backup create games-manual-$(date +%Y%m%d) --include-namespaces games
 ```
